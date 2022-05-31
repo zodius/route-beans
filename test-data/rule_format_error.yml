@@ -5,7 +5,6 @@ gateways:
   - 172.20.10.1
 routes:
   - dst: 10.0.0.0/8
-    gateway: named_gateway
   - dst: 172.17.0.0/16
     gateway: named_gateway
   - dst: 172.21.0.0/16
