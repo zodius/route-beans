@@ -6,6 +6,7 @@ import (
 	"log"
 	"os/exec"
 	"route-beans/model"
+	"strings"
 )
 
 type routeTableRepo struct{}
@@ -29,4 +30,21 @@ func (r *routeTableRepo) FlushRoutingTable() (err error) {
 	}
 	log.Print("Flush successed.")
 	return
+}
+
+func (r *routeTableRepo) AddRouting(dst string, gateway string) (err error) {
+	// Run several times until all cleanned.
+	cmd := exec.Command("route", "-n", "add", dst, gateway)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("Failed to run cmd: %s\n", err)
+	}
+
+	if strings.Contains(string(out), "File exists") {
+		return nil
+	} else if strings.Contains(string(out), "add net") {
+		return nil
+	}
+
+	return fmt.Errorf(string(out))
 }
