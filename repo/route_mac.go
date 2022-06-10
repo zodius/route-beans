@@ -9,13 +9,13 @@ import (
 	"strings"
 )
 
-type routeTableRepo struct{}
+type routeRepo struct{}
 
-func NewRouteRepo() model.RouteTableRepo {
-	return &routeTableRepo{}
+func NewRouteRepo() model.RouteRepo {
+	return &routeRepo{}
 }
 
-func (r *routeTableRepo) FlushRoutingTable() (err error) {
+func (r *routeRepo) FlushRoutingTable() (err error) {
 	// Run several times until all cleanned.
 	try := 10
 	for i := try; i > 0; i-- {
@@ -32,7 +32,7 @@ func (r *routeTableRepo) FlushRoutingTable() (err error) {
 	return
 }
 
-func (r *routeTableRepo) AddRouting(dst string, gateway string) (err error) {
+func (r *routeRepo) AddRouting(dst string, gateway string) (err error) {
 	// Run several times until all cleanned.
 	cmd := exec.Command("route", "-n", "add", dst, gateway)
 	out, err := cmd.CombinedOutput()

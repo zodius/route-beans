@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"route-beans/model"
 
-	yaml "gopkg.in/yaml.v3"
+	"gopkg.in/yaml.v3"
 )
 
 type ProfileImplement model.Profile
@@ -84,14 +84,23 @@ func (p *ProfileImplement) UnmarshalYAML(data *yaml.Node) error {
 	return nil
 }
 
+func findGateway(gateway_name string, gateways []model.Gateway) (result model.Gateway, found bool) {
+	for _, gateway := range gateways {
+		if gateway_name == gateway.Name {
+			return gateway, true
+		}
+	}
+	return model.Gateway{}, false
+}
+
 type profileRepo struct{}
 
 func NewProfileRepo() model.ProfileRepo {
 	return &profileRepo{}
 }
 
-func (r *profileRepo) LoadProfileFile(filename string) (profile model.Profile, err error) {
-	data, err := ioutil.ReadFile(filename)
+func (r *profileRepo) LoadProfileFromFile(filepath string) (profile model.Profile, err error) {
+	data, err := ioutil.ReadFile(filepath)
 	if err != nil {
 		return
 	}
@@ -100,13 +109,4 @@ func (r *profileRepo) LoadProfileFile(filename string) (profile model.Profile, e
 
 	err = yaml.Unmarshal(data, &parsedProfile)
 	return model.Profile(parsedProfile), err
-}
-
-func findGateway(gateway_name string, gateways []model.Gateway) (result model.Gateway, found bool) {
-	for _, gateway := range gateways {
-		if gateway_name == gateway.Name {
-			return gateway, true
-		}
-	}
-	return model.Gateway{}, false
 }

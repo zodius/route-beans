@@ -4,43 +4,49 @@ import (
 	"fmt"
 	"log"
 	"os"
-
 	"route-beans/repo"
 	"route-beans/service"
 
 	"github.com/urfave/cli/v2"
 )
 
+type logWriter struct {
+}
+
+func (writer logWriter) Write(bytes []byte) (int, error) {
+	return fmt.Print("[+] " + string(bytes))
+}
+
 func main() {
+	log.SetFlags(0)
+	log.SetOutput(new(logWriter))
+
 	routeRepo := repo.NewRouteRepo()
 	profileRepo := repo.NewProfileRepo()
-	service := service.NewRouteService(routeRepo, profileRepo)
+	routeBeanService := service.NewRouteBeanService(routeRepo, profileRepo)
 
 	app := &cli.App{
 		Commands: []*cli.Command{
 			{
-				Name:  "reset",
-				Usage: "Reset/Flush routing table to default",
+				Name:  "list",
+				Usage: "List profiles",
 				Action: func(c *cli.Context) error {
-					return service.FlushRoutingTable()
+					return routeBeanService.ListProfiles()
 				},
 			},
 			{
-				Name:  "profile",
-				Usage: "Load routing table setting from profile",
+				Name:  "apply",
+				Usage: "Apply profile",
 				Action: func(c *cli.Context) error {
-					profile_path := c.String("p")
-					if profile_path == "" {
-						return fmt.Errorf("profile yaml is required")
-					}
-					return service.ApplyProfile(profile_path)
+					profileName := c.Args().First()
+					return routeBeanService.ApplyProfile(profileName)
 				},
-				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:    "p",
-						Aliases: []string{"profile"},
-						Usage:   "path of profile yaml",
-					},
+			},
+			{
+				Name:  "reset",
+				Usage: "Reset routing table to default",
+				Action: func(c *cli.Context) error {
+					return routeBeanService.Reset()
 				},
 			},
 		},

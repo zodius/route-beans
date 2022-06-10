@@ -18,5 +18,5 @@ type Profile struct {
 }
 
 type ProfileRepo interface {
-	LoadProfileFile(profile_path string) (profile Profile, err error)
+	LoadProfileFromFile(filepath string) (profile Profile, err error)
 }
